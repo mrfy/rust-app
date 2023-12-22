@@ -1,5 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+use std::process::Command;
+
 use mongodb::{bson::Document, options::ClientOptions, Client};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
@@ -8,35 +10,30 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
-// #[tauri::command]
-// async fn list_databases(
-//     client: tauri::State<'_, Client>,
-//     collection: String,
-//     filter: bson::Document,
-// ) -> Result<String, Box<dyn Error>> {
-//     let mut client_options = ClientOptions::parse(
-//         "mongodb://root:dev@localhost:27017/?authMechanism=DEFAULT&directConnection=true",
-//     );
-
-//     let client = Client::with_options(client_options);
-
-//     // List the names of the databases in that deployment.
-//     for db_name in client?.list_database_names(None, None).await? {
-//         println!("{}", db_name);
-//     }
-
-//     Ok("OK".to_string())
-// }
-
 #[tauri::command]
-async fn list_databases(client: tauri::State<'_, Client>) -> Result<Vec<Document>, ()> {
-    // let db: mongodb::Database = client.default_database().unwrap();
+async fn list_databases(client: tauri::State<'_, Client>) -> Result<Vec<String>, ()> {
+    let mut results = Vec::new();
 
+    let cmd = format!("mongorestore -v --uri 'mongodb://root:dev@localhost:27017/?directConnection=true' --drop --archive=bakap --nsFrom=\"platform.*\" --nsTo=\"platform_quality_ori.*\" --gzip");
+
+    println!("{}", cmd);
+
+    let output = Command::new("mongorestore").output();
+
+    match output {
+        Ok(res) => {
+            println!("{:?}", res);
+        }
+        Err(err) => {
+            println!("{}", err);
+            // panic!(err);
+        }
+    }
     for db_name in client.list_database_names(None, None).await.unwrap() {
         println!("{}", db_name);
+        results.push(db_name)
     }
 
-    let results = Vec::new();
     Ok(results)
 }
 
