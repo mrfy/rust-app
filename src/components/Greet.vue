@@ -22,7 +22,9 @@ async function invokeMessage() {
     <button type="submit">Greet</button>
   </form>
 
-  <button type="submit" @click="invokeMessage">aa</button>
+  <form class="row" @submit.prevent="greet">
+    <button type="submit" @click="invokeMessage">aa</button>
+  </form>
 
   <p>{{ greetMsg }}</p>
 </template>
