@@ -1,7 +1,5 @@
 <script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import Greet from "./components/Greet.vue";
+import ServerList from "./components/ServerList.vue";
 import { invoke } from "@tauri-apps/api";
 
 async function invokeMessage() {
@@ -13,22 +11,50 @@ async function invokeMessage() {
     )
     .catch((e) => console.error(e));
 }
+const links = ["Dashboard", "Messages", "Profile", "Updates"];
 </script>
-
 <template>
-  <div class="container">
-    <h1>Welcome to Taasdasi!</h1>
-    <div class="row">
-      <a href="https://vitejs.dev" target="_blank">
-        <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-      </a>
-    </div>
-    <div class="main-c">
-      <button @click="invokeMessage">Clicke Me</button>
-    </div>
+  <v-app id="inspire">
+    <v-app-bar flat>
+      <v-container class="mx-auto d-flex align-center justify-center">
+        <v-avatar class="me-4" color="grey-darken-1" size="32"></v-avatar>
 
-    <Greet />
-  </div>
+        <!-- <v-btn
+          v-for="link in links"
+          :key="link"
+          :text="link"
+          variant="text"
+        ></v-btn> -->
+
+        <v-spacer></v-spacer>
+
+        <v-responsive max-width="160">
+          <v-text-field
+            density="compact"
+            flat
+            hide-details
+            label="Search"
+            rounded="lg"
+            single-line
+            variant="solo-filled"
+          ></v-text-field>
+        </v-responsive>
+      </v-container>
+    </v-app-bar>
+
+    <v-main class="bg-grey-lighten-5">
+      <v-container>
+        <v-row>
+          <v-col cols="2"> <ServerList /> </v-col>
+
+          <v-col>
+            <v-card elevation="3" min-height="70vh" rounded="lg"></v-card>
+            <!-- <v-sheet> adsad </v-sheet> -->
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <style scoped>
