@@ -1,8 +1,10 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-use std::process::Command;
-
 use mongodb::{bson::Document, options::ClientOptions, Client};
+use serde_json::json;
+use tauri::Wry;
+use std::{process::Command, path::PathBuf};
+use tauri_plugin_store::{StoreBuilder, StoreCollection};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
@@ -78,6 +80,19 @@ fn main() {
             list_databases,
             my_custom_command
         ])
+        .plugin(tauri_plugin_store::Builder::default().build())
+        .setup(|app| {
+
+            let stores = app.state::<StoreCollection<Wry>>();
+let path = PathBuf::from("path/to/the/storefile");
+
+with_store(app_handle, stores, path, |store| store.insert("a".to_string(), json!("b")))
+
+
+            let mut store = StoreBuilder::new(app.handle(), "path/to/store.bin".parse()?).build();
+
+            Ok(store.insert("a".to_string(), json!("b"))?) // note that values must be serd_json::Value to be compatible with JS
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
